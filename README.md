@@ -1,6 +1,8 @@
 # xpol/setup-lua
 
-[![Actions Status](https://github.com/xpol/setup-lua/workflows/test/badge.svg)](https://github.com/xpol/setup-lua/actions)
+[![Actions Status](https://github.com/xpol/setup-lua/workflows/test/badge.svg)](https://github.com/xpol/setup-lua/actions?workflow=test)
+
+
 
 Github Action to install Lua/LuaJIT on Unbutu/macOS/Windows.
 

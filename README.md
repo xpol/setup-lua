@@ -27,7 +27,7 @@ Install specific version of Lua:
 ```yaml
 - uses: xpol/setup-lua@v1
   with:
-    luaVersion: "5.1.5"
+    lua-version: "5.1.5"
 ```
 
 Install specific version of LuaJIT:
@@ -35,12 +35,12 @@ Install specific version of LuaJIT:
 ```yaml
 - uses: xpol/setup-lua@v1
   with:
-    luaVersion: "luajit-2.0.5"
+    lua-version: "luajit-2.0.5"
 ```
 
 ## Inputs
 
-### `luaVersion`
+### `lua-version`
 
 **Default**: `"5.3.5"`
 
@@ -106,7 +106,7 @@ jobs:
 
     - uses: xpol/setup-lua@v1
       with:
-        luaVersion: "5.1.5"
+        lua-version: "5.1.5"
 
     - uses: leafo/gh-actions-luarocks@v2
 
@@ -122,7 +122,7 @@ jobs:
 
 This example:
 
-* Uses Lua 5.1.5 — You can use another version by chaning the `luaVersion` varible. LuaJIT versions can be used by prefixing the version with `luajit-`, i.e. `luajit-2.1.0-beta3`
+* Uses Lua 5.1.5 — You can use another version by chaning the `lua-version` varible. LuaJIT versions can be used by prefixing the version with `luajit-`, i.e. `luajit-2.1.0-beta3`
 * Uses a `.rockspec` file the root directory of your repository to install dependencies and test packaging the module via `luarocks make`
 
 View the documentation for the individual actions (linked above) to learn more about how they work.
@@ -142,7 +142,7 @@ jobs:
     - uses: actions/checkout@master
     - uses: xpol/setup-lua@v1
       with:
-        luaVersion: ${{ matrix.luaVersion }}
+        lua-version: ${{ matrix.luaVersion }}
 
     # ...
 ```

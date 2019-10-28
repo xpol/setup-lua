@@ -15,7 +15,7 @@ jobs:
     - uses: actions/checkout@master
     - uses: ./
       with:
-        luaVersion: ${{ matrix.luaVersion }}
+        lua-version: ${{ matrix.luaVersion }}
 
     - name: test lua
       run: |

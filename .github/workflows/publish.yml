@@ -19,7 +19,7 @@ jobs:
     - uses: actions/checkout@master
     - uses: xpol/setup-lua@master
       with:
-        luaVersion: ${{ matrix.luaVersion }}
+        lua-version: ${{ matrix.luaVersion }}
 
     - name: bundle binaries
       run: tar czf '${{matrix.luaVersion}}.tar.gz' .lua

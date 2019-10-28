@@ -100,7 +100,7 @@ function getTarball(version) {
 }
 
 function getLuaVersion() {
-  const luaVersion = core.getInput('luaVersion', { required: true })
+  const luaVersion = core.getInput('lua-version', { required: true })
   return VERSION_ALIASES[luaVersion] || luaVersion
 }
 

@@ -1,0 +1,23 @@
+name: test
+
+on: [push]
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        luaVersion: ["5.1.5", "5.2.4", "5.3.5"]
+        os: [macOs-latest, ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@master
+    - uses: ./
+      with:
+        luaVersion: ${{ matrix.luaVersion }}
+
+    - name: test lua
+      run: |
+        which lua
+        lua -e "print(_VERSION)"

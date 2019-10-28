@@ -1,0 +1,16 @@
+
+name: "Setup Lua/LuaJIT"
+description: "Download, build, and install Lua or LuaJIT."
+
+branding:
+  icon: 'moon'
+  color: 'blue'
+
+inputs:
+  lua-version:
+    description: "The version of Lua to install. Supported versions: Lua >= 5.1.0, LuaJIT >= 2.0.0"
+    default: "5.3.5"
+
+runs:
+  using: 'node12'
+  main: 'main.js'

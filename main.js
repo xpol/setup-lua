@@ -1,4 +1,3 @@
-
 const core = require("@actions/core")
 const exec = require("@actions/exec")
 const io = require("@actions/io")
@@ -22,7 +21,9 @@ const VERSION_ALIASES = {
 }
 
 const TARBALLS = {
-  "5.4.0-beta1":        ["961e2692a10a4a3c6fe80086e4cbefd5", "https://www.lua.org/work/lua-5.4.0-beta.tar.gz"],
+  // need patch for 5.4
+  // "5.4.1":              ["1d575faef1c907292edd79e7a2784d30", "https://www.lua.org/ftp/lua-5.4.1.tar.gz"],
+  // "5.4.0":              ["dbf155764e5d433fc55ae80ea7060b60", "https://www.lua.org/ftp/lua-5.4.0.tar.gz"],
   "5.3.5":              ["4f4b4f323fd3514a68e0ab3da8ce3455", "https://www.lua.org/ftp/lua-5.3.5.tar.gz"],
   "5.3.4":              ["53a9c68bcc0eda58bdc2095ad5cdfc63", "https://www.lua.org/ftp/lua-5.3.4.tar.gz"],
   "5.3.3":              ["703f75caa4fdf4a911c1a72e67a27498", "https://www.lua.org/ftp/lua-5.3.3.tar.gz"],
@@ -100,8 +101,13 @@ function getTarball(version) {
 }
 
 function getLuaVersion() {
-  const luaVersion = core.getInput('lua-version', { required: true })
-  return VERSION_ALIASES[luaVersion] || luaVersion
+  const luaVersion = core.getInput('lua-version', { required: false })
+  return VERSION_ALIASES[luaVersion] || luaVersion || "5.1.5"
+}
+
+function getPlatform() {
+  const platform = core.getInput('platfrom', { required: false });
+  return platform || false;
 }
 
 async function download(url, hash) {
@@ -126,7 +132,6 @@ async function extractTarball(tarball, version) {
     cwd: SOURCE_DIRECTORY
   })
   showDirectory(SOURCE_DIRECTORY)
-
   const dir = tarballContentDirectory(version)
   return path.join(SOURCE_DIRECTORY, dir)
 }
@@ -162,13 +167,23 @@ async function addCMakeBuildScripts(sourcePath, luaVersion) {
   mergeDirectory(path.join(__dirname, "patch", "shared"), sourcePath)
   const v = luaVersion.replace(/\.\d*$/,'')
   mergeDirectory(path.join(__dirname, "patch", "lua", v), sourcePath)
+  console.log("VERSION: " + v)
   showDirectory(sourcePath)
 }
 
-async function buildAndInstall(sourcePath) {
-  await exec.exec(`cmake -H"${sourcePath}" -Bbuild -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}`, undefined, {
-    cwd: sourcePath
-  })
+async function buildAndInstall(sourcePath, platform) {
+
+  if(platform){
+    await exec.exec(`cmake -H"${sourcePath}" -Bbuild -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} -A${platform}`, undefined, {
+      cwd: sourcePath
+    })
+  }
+  else{
+    await exec.exec(`cmake -H"${sourcePath}" -Bbuild -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}`, undefined, {
+      cwd: sourcePath
+    })
+  }
+
   await exec.exec(`cmake --build build --config Release --target install`, undefined, {
     cwd: sourcePath
   })
@@ -179,9 +194,10 @@ async function buildAndInstall(sourcePath) {
 async function main() {
   await installSystemDependencies()
   const luaVersion = getLuaVersion()
-  const sourcePath = await downloadSource(luaVersion)  
+  const platform = getPlatform();
+  const sourcePath = await downloadSource(luaVersion)
   await addCMakeBuildScripts(sourcePath, luaVersion)
-  await buildAndInstall(sourcePath)
+  await buildAndInstall(sourcePath, platform)
 }
 
 main().catch(err => {

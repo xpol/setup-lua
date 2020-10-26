@@ -1,4 +1,3 @@
-
 name: "Setup Lua/LuaJIT"
 description: "Download, build, and install Lua or LuaJIT."
 
@@ -10,6 +9,8 @@ inputs:
   lua-version:
     description: "The version of Lua to install. Supported versions: Lua >= 5.1.0, LuaJIT >= 2.0.0"
     default: "5.3.5"
+  platform:
+    description: "Optional: The target platform (e.g. -A Win32 | x64)."
 
 runs:
   using: 'node12'

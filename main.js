@@ -14,16 +14,16 @@ const VERSION_ALIASES = {
   "5.1": "5.1.5",
   "5.2": "5.2.4",
   "5.3": "5.3.5",
-  "5.4": "5.3.5",
+  "5.4": "5.4.2",
   "luajit": "luajit-2.0.5",
   "luajit-2.0": "luajit-2.0.5",
   "luajit-2.1": "luajit-2.1.0-beta3",
 }
 
 const TARBALLS = {
-  // need patch for 5.4
-  // "5.4.1":              ["1d575faef1c907292edd79e7a2784d30", "https://www.lua.org/ftp/lua-5.4.1.tar.gz"],
-  // "5.4.0":              ["dbf155764e5d433fc55ae80ea7060b60", "https://www.lua.org/ftp/lua-5.4.0.tar.gz"],
+  "5.4.2":              ["49c92d6a49faba342c35c52e1ac3f81e", "https://www.lua.org/ftp/lua-5.4.2.tar.gz"],
+  "5.4.1":              ["1d575faef1c907292edd79e7a2784d30", "https://www.lua.org/ftp/lua-5.4.1.tar.gz"],
+  "5.4.0":              ["dbf155764e5d433fc55ae80ea7060b60", "https://www.lua.org/ftp/lua-5.4.0.tar.gz"],
   "5.3.5":              ["4f4b4f323fd3514a68e0ab3da8ce3455", "https://www.lua.org/ftp/lua-5.3.5.tar.gz"],
   "5.3.4":              ["53a9c68bcc0eda58bdc2095ad5cdfc63", "https://www.lua.org/ftp/lua-5.3.4.tar.gz"],
   "5.3.3":              ["703f75caa4fdf4a911c1a72e67a27498", "https://www.lua.org/ftp/lua-5.3.3.tar.gz"],

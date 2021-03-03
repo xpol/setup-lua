@@ -6,7 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        luaVersion: ["5.1.5", "5.2.4", "5.3.5"]
+        luaVersion: ["5.1.5", "5.2.4", "5.3.5", "5.4.2"]
         os: [macOs-latest, ubuntu-latest]
 
     runs-on: ${{ matrix.os }}
@@ -25,7 +25,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        luaVersion: ["5.1.5", "5.2.4", "5.3.5"]
+        luaVersion: ["5.1.5", "5.2.4", "5.3.5", "5.4.2"]
         platform: [Win32, x64]
     steps:
     - uses: actions/checkout@master

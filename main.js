@@ -182,15 +182,12 @@ async function installSystemDependencies() {
 }
 
 async function addCMakeBuildScripts(sourcePath, luaVersion) {
-  if (luaVersion.indexOf("jit") > -1) {
-    return;
-  }
   debug("addCMakeBuildScripts %s, %s", sourcePath, luaVersion)
   fs.unlinkSync(path.join(sourcePath, "src", "luaconf.h"))
   debug("removed luaconf.h")
   mergeDirectory(path.join(__dirname, "patch", "shared"), sourcePath)
   debug("merged patch/shared with %s", sourcePath)
-  const v = luaVersion.replace(/\.\d*$/,'')
+  const v = luaVersion.replace(/\.\d*(-beta\d+)?$/,'')
   debug("v: %s", v)
   mergeDirectory(path.join(__dirname, "patch", "lua", v), sourcePath)
   console.log("VERSION: " + v)
@@ -199,11 +196,11 @@ async function addCMakeBuildScripts(sourcePath, luaVersion) {
 
 async function buildAndInstall(sourcePath, platform) {
   debug("buildAndInstall %s, %s", sourcePath, platform)
-  if (/jit/i.test(sourcePath)) {
-    await buildAndInstallLuaJIT(sourcePath, platform)
-  } else {
-    await buildAndInstallLua5(sourcePath, platform)
-  }
+  await buildAndInstallLua5(sourcePath, platform)
+  // if (/jit/i.test(sourcePath)) {
+  //   await buildAndInstallLuaJIT(sourcePath, platform)
+  // } else {
+  // }
   core.addPath(path.join(INSTALL_PREFIX, "bin"));
 }
 
@@ -234,6 +231,12 @@ async function buildAndInstallLua5(sourcePath, platform) {
     })
   }
   else{
+    let env
+    if (process.platform == "darwin" && /jit/i.test(sourcePath)) {
+      env = {
+        MACOSX_DEPLOYMENT_TARGET: os.release().split('.').slice(0, 2).map(n => `0${n}`.substr(-2)).join('.'),
+      }
+    }
     await exec.exec(`cmake -H"${sourcePath}" -Bbuild -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX}`, undefined, {
       cwd: sourcePath
     })

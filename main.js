@@ -216,8 +216,14 @@ async function buildAndInstallLuaJIT(sourcePath) {
     }
   }
   await exec.exec(`make PREFIX=${INSTALL_PREFIX}`, undefined, { cwd: sourcePath, env })
-  await exec.exec("sudo make install", undefined, { cwd: sourcePath, env })
-  
+  await exec.exec("sudo -E make install", undefined, { cwd: sourcePath })
+  if (/beta/i.test(sourcePath)) {
+    let version = path.parse(sourcePath).base
+    if (!version) {
+      throw new Error(`Unable to determine full beta binary name from source path: ${sourcePath}`)
+    }
+    await exec.exec("sudo -E ln -sf luajit-2.1.0-beta3 /usr/local/bin/luajit")
+  }
 }
 
 async function buildAndInstallLua5(sourcePath, platform) {

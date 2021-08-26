@@ -13,6 +13,7 @@
     "@actions/exec": "^1.0.1",
     "@actions/io": "^1.0.1",
     "@actions/tool-cache": "^1.1.1",
+    "debug": "^4.3.2",
     "md5-file": "^4.0.0"
   }
 }

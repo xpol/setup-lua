@@ -3,6 +3,10 @@ const exec = require("@actions/exec")
 const io = require("@actions/io")
 const tc = require("@actions/tool-cache")
 
+process.env["DEBUG"] = process.env["DEBUG"] || "setup-lua"
+const debug = require("debug")("setup-lua")
+
+
 const path = require("path")
 const fs = require("fs")
 const md5File = require('md5-file')
@@ -93,7 +97,9 @@ function mergeDirectory(source, dest) {
 }
 
 function getTarball(version) {
+  debug("getTarball %s", version)
   const v = VERSION_ALIASES[version] || version
+  debug("maybe aliased version %s", v || "v is undefined...")
   if (!TARBALLS[v] || TARBALLS[v].length != 2) {
     throw RangeError("Unsupported lua version: " + version)
   }
@@ -101,7 +107,9 @@ function getTarball(version) {
 }
 
 function getLuaVersion() {
+  debug("getLuaVersion")
   const luaVersion = core.getInput('lua-version', { required: false })
+  debug("version from input %s", luaVersion)
   return VERSION_ALIASES[luaVersion] || luaVersion || "5.1.5"
 }
 
@@ -111,6 +119,7 @@ function getPlatform() {
 }
 
 async function download(url, hash) {
+  debug("download url: %s, hash: %s", url, hash)
   const luaSourceTar = await tc.downloadTool(url)
   if (hash != md5File.sync(luaSourceTar)) {
     throw Error("MD5 mismatch, please check your network.");
@@ -119,30 +128,38 @@ async function download(url, hash) {
 }
 
 function tarballContentDirectory(version) {
+  debug("tarballContentDirectory %s", version)
   if (version.startsWith("luajit")) {
-    const luajitVersion = luaVersion.substr("luajit-".length)
+    debug("LuaJIT version: %s", luajitVersion)
     return `LuaJIT-${luajitVersion}`
   }
   return `lua-${version}`
 }
 
 async function extractTarball(tarball, version) {
+  debug("extractTarball %s", version)
   await io.mkdirP(SOURCE_DIRECTORY)
+  debug("made source directory")
   await exec.exec(`cmake -E tar xzf "${tarball}"`, undefined, {
     cwd: SOURCE_DIRECTORY
   })
+  debug("executed cmake -E tar xzf")
   showDirectory(SOURCE_DIRECTORY)
   const dir = tarballContentDirectory(version)
+  debug("tarball content directory: %s", dir)
   return path.join(SOURCE_DIRECTORY, dir)
 }
 
 async function downloadSource(luaVersion) {
+  debug("downloadSource %s", luaVersion)
   const [url, hash] = getTarball(luaVersion)
+  debug("tarball url: %s, hash: %s", url, hash)
   const tarball = await download(url, hash)
   return extractTarball(tarball, luaVersion)
 }
 
 async function installSystemDependencies() {
+  debug("installSystemDependencies")
   if (process.platform == "linux") {
     return await exec.exec("sudo apt-get install -q libreadline-dev libncurses-dev", undefined, {
       env: {
@@ -163,15 +180,20 @@ async function installSystemDependencies() {
 }
 
 async function addCMakeBuildScripts(sourcePath, luaVersion) {
+  debug("addCMakeBuildScripts %s, %s", sourcePath, luaVersion)
   fs.unlinkSync(path.join(sourcePath, "src", "luaconf.h"))
+  debug("removed luaconf.h")
   mergeDirectory(path.join(__dirname, "patch", "shared"), sourcePath)
+  debug("merged patch/shared with %s", sourcePath)
   const v = luaVersion.replace(/\.\d*$/,'')
+  debug("v: %s", v)
   mergeDirectory(path.join(__dirname, "patch", "lua", v), sourcePath)
   console.log("VERSION: " + v)
   showDirectory(sourcePath)
 }
 
 async function buildAndInstall(sourcePath, platform) {
+  debug("buildAndInstall %s, %s", sourcePath, platform)
 
   if(platform){
     await exec.exec(`cmake -H"${sourcePath}" -Bbuild -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} -A${platform}`, undefined, {
@@ -192,12 +214,19 @@ async function buildAndInstall(sourcePath, platform) {
 }
 
 async function main() {
+  debug("main")
   await installSystemDependencies()
+  debug("System dependencies installed")
   const luaVersion = getLuaVersion()
+  debug("Got lua version: %s", luaVersion)
   const platform = getPlatform();
+  debug("Got Platform: %s", platform)
   const sourcePath = await downloadSource(luaVersion)
+  debug("Downloaded to: %s", sourcePath)
   await addCMakeBuildScripts(sourcePath, luaVersion)
+  debug("Added cmake build scripts")
   await buildAndInstall(sourcePath, platform)
+  debug("built and installed")
 }
 
 main().catch(err => {

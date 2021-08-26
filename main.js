@@ -130,6 +130,7 @@ async function download(url, hash) {
 function tarballContentDirectory(version) {
   debug("tarballContentDirectory %s", version)
   if (version.startsWith("luajit")) {
+    const luajitVersion = version.substr("luajit-".length)
     debug("LuaJIT version: %s", luajitVersion)
     return `LuaJIT-${luajitVersion}`
   }

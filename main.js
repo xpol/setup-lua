@@ -3,13 +3,14 @@ const exec = require("@actions/exec")
 const io = require("@actions/io")
 const tc = require("@actions/tool-cache")
 
+
+
 process.env["DEBUG"] = process.env["DEBUG"] || "setup-lua"
 const debug = require("debug")("setup-lua")
-
-
 const path = require("path")
 const fs = require("fs")
 const md5File = require('md5-file')
+const os = require("os")
 
 const SOURCE_DIRECTORY = path.join(process.cwd(), ".source/")
 const INSTALL_PREFIX = path.join(process.cwd(), ".lua/")
@@ -181,6 +182,9 @@ async function installSystemDependencies() {
 }
 
 async function addCMakeBuildScripts(sourcePath, luaVersion) {
+  if (luaVersion.indexOf("jit") > -1) {
+    return;
+  }
   debug("addCMakeBuildScripts %s, %s", sourcePath, luaVersion)
   fs.unlinkSync(path.join(sourcePath, "src", "luaconf.h"))
   debug("removed luaconf.h")
@@ -195,7 +199,29 @@ async function addCMakeBuildScripts(sourcePath, luaVersion) {
 
 async function buildAndInstall(sourcePath, platform) {
   debug("buildAndInstall %s, %s", sourcePath, platform)
+  if (/jit/i.test(sourcePath)) {
+    await buildAndInstallLuaJIT(sourcePath, platform)
+  } else {
+    await buildAndInstallLua5(sourcePath, platform)
+  }
+  core.addPath(path.join(INSTALL_PREFIX, "bin"));
+}
 
+async function buildAndInstallLuaJIT(sourcePath) {
+  debug("buildAndInstallLuaJIT %s", sourcePath)
+  let env
+  if (process.platform == "darwin") {
+    env = {
+      MACOSX_DEPLOYMENT_TARGET: os.release().split('.').slice(0, 2).map(n => `0${n}`.substr(-2)).join('.'),
+    }
+  }
+  await exec.exec(`make PREFIX=${INSTALL_PREFIX}`, undefined, { cwd: sourcePath, env })
+  await exec.exec("sudo make install", undefined, { cwd: sourcePath, env })
+  
+}
+
+async function buildAndInstallLua5(sourcePath, platform) {
+  debug("buildAndInstallLua5 %s, %s", sourcePath, platform)
   if(platform){
     await exec.exec(`cmake -H"${sourcePath}" -Bbuild -DCMAKE_INSTALL_PREFIX=${INSTALL_PREFIX} -A${platform}`, undefined, {
       cwd: sourcePath
@@ -210,8 +236,6 @@ async function buildAndInstall(sourcePath, platform) {
   await exec.exec(`cmake --build build --config Release --target install`, undefined, {
     cwd: sourcePath
   })
-
-  core.addPath(path.join(INSTALL_PREFIX, "bin"));
 }
 
 async function main() {

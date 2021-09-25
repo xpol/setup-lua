@@ -106,7 +106,7 @@ function getLuaVersion() {
 }
 
 function getPlatform() {
-  const platform = core.getInput('platfrom', { required: false });
+  const platform = core.getInput('platform', { required: false });
   return platform || false;
 }
 

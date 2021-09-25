@@ -40,6 +40,7 @@ set ( LUA_CPATH_DEFAULT "./?${LUA_MODULE_SUFFIX};${LUA_DIR}${LUA_CDIR}/?${LUA_MO
 if ( WIN32 AND NOT CYGWIN )
   # Windows systems
   option ( LUA_USE_WINDOWS "Windows specific build." ON )
+  option ( LUA_DL_DLL "Load dynamic library" ON )
   option ( LUA_BUILD_WLUA "Build wLua interpretter without console output." ON )
   option ( LUA_BUILD_AS_DLL "Build Lua library as Dll." ${BUILD_SHARED_LIBS} )
 

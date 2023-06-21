@@ -21,13 +21,13 @@ Install Lua:
 *Will install the latest stable release of PUC-Rio Lua.*
 
 ```yaml
-- uses: xpol/setup-lua@v1
+- uses: xpol/setup-lua@v0.3
 ```
 
 Install specific version of Lua:
 
 ```yaml
-- uses: xpol/setup-lua@v1
+- uses: xpol/setup-lua@v0.3
   with:
     lua-version: "5.1.5"
 ```
@@ -35,7 +35,7 @@ Install specific version of Lua:
 Install specific version of LuaJIT:
 
 ```yaml
-- uses: xpol/setup-lua@v1
+- uses: xpol/setup-lua@v0.3
   with:
     lua-version: "luajit-2.0.5"
 ```
@@ -104,9 +104,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master
+    - uses: actions/checkout@v3
 
-    - uses: xpol/setup-lua@v1
+    - uses: xpol/setup-lua@v0.3
       with:
         lua-version: "5.1.5"
 
@@ -141,8 +141,8 @@ jobs:
         luaVersion: ["5.1.5", "5.2.4", "luajit-2.1.0-beta3"]
 
     steps:
-    - uses: actions/checkout@master
-    - uses: xpol/setup-lua@v1
+    - uses: actions/checkout@v3
+    - uses: xpol/setup-lua@v0.3
       with:
         lua-version: ${{ matrix.luaVersion }}
 
